@@ -1,0 +1,1 @@
+Veamos la herramienta en pantalla. Esta es la vista de la colección. Cada fila es una referencia con su identificador, su título y su estado. Arriba hay un buscador y un filtro por estado. Aquí la persona parte de criterios claros. El visor no modifica nada. Solo muestra lo que el registro contiene. Desde esta misma pantalla se entiende qué entró, de qué fuente y con qué fecha.

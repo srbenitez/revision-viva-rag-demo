@@ -1,0 +1,1 @@
+Construimos un registro vivo basado en la guía diez del curso. Lo usa un docente o un investigador. Recibe lotes de referencias con título, año y resumen. Entrega tres cosas. Una colección sin duplicados. Una lista de pendientes con una sugerencia de pertinencia. Y una síntesis con citas comprobadas. Todo queda en archivos de texto sencillos que cualquiera puede abrir y revisar.
