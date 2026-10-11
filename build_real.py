@@ -65,19 +65,34 @@ scopus = [
    "incluir","QA universitario sobre informacion institucional; cumple criterios."),
 ]
 
-# --- Fuente 2: Google Academico (sin DOI ni resumen exportable) ---
-# (titulo, anio, autores, enlace_estable_o_vacio, nota_extra)
+# --- Fuente 2: Google Academico ---
+# (id, titulo, anio, autores, enlace, nota, resumen_recuperado, sugerencia, justificacion)
+# resumen_recuperado: SOLO si se verifico en fuente real (arXiv / editor). Parafraseado.
+# Vacio = no se pudo verificar -> queda como evidencia insuficiente.
 scholar = [
- ("H01","Hybrid context retrieval augmented generation pipeline: LLM-augmented knowledge graphs and vector database for accreditation reporting assistance","2024","Edwards C.","https://arxiv.org/abs/2405.15436",""),
- ("H02","A Reliability-Aware Retrieval-Augmented Generation Architecture for Open Language Models in Higher Education Decision Support","2026","Garcia-Lopez I.M.; Guillen-Yparrea N.","",""),
- ("H03","Enhancing scientific communication and institutional identity through a retrieval-augmented generation digital personal tutor","2026","Di Tore S. et al.","",""),
- ("H04","Optimizing and evaluating a retrieval-augmented generation system for normative document retrieval in hospital settings","2025","da Cunha M.V. et al.","","posible relacion con S03 (mismos autores, hospital): revisar si es version previa."),
- ("H05","DisastRAG: A Multi-Source Disaster Information Integration and Access System Based on Retrieval-Augmented Large Language Models","2026","Li B. et al.","https://arxiv.org/abs/2605.05210","el titulo sugiere tema de desastres, probablemente fuera del criterio; confirmar con el texto."),
- ("H06","From policy to practice: clause-grounded answers with retrieval-augmented generation","2026","Tsai W.L.; Huang R.Q.","",""),
- ("H07","Effective Chunking for Retrieval-Augmented Generation over Structured Institutional Documents","2026","Khalib S.S.I. et al.","",""),
- ("H08","Retrieval-Augmented Generative Indonesian Question Answering for Campus Planning Documents: A Case Study at Vocational School Universitas Sebelas Maret","2026","Khadija M.A. et al.","",""),
- ("H09","OCR-integrated retrieval-augmented generation for PDF-document question answering system in vocational higher education","2026","Khadija M.A. et al.","",""),
- ("H10","Reimagining Academic Library Services through Local RAG: Concepts and Frameworks","2025","Pal P.K.","",""),
+ ("H01","Hybrid context retrieval augmented generation pipeline: LLM-augmented knowledge graphs and vector database for accreditation reporting assistance","2024","Edwards C.","https://arxiv.org/abs/2405.15436","",
+   "Pipeline RAG que ayuda a escuelas de negocios a preparar informes de acreditacion AACSB combinando base vectorial y grafo de conocimiento con datos de los estandares y documentos institucionales; evaluado con RAGAs (verificado en arXiv 2405.15436).",
+   "incluir","RAG sobre documentos institucionales universitarios para acreditacion; cumple tema y poblacion (educacion superior)."),
+ ("H02","A Reliability-Aware Retrieval-Augmented Generation Architecture for Open Language Models in Higher Education Decision Support","2026","Garcia-Lopez I.M.; Guillen-Yparrea N.","https://www.mdpi.com/2073-431X/15/9/564","",
+   "Arquitectura RAG gobernada para modelos abiertos en apoyo a decisiones universitarias (interpretacion de politicas, asesoria, resumenes): ingesta documental, recuperacion hibrida, reranking, generacion con evidencia, rechazo por confianza y revision humana; define un indice de fiabilidad de siete dimensiones (verificado en MDPI Computers 15(9):564).",
+   "incluir","RAG para soporte de decisiones en educacion superior; cumple los tres criterios."),
+ ("H03","Enhancing scientific communication and institutional identity through a retrieval-augmented generation digital personal tutor","2026","Di Tore S. et al.","https://www.mdpi.com/2079-9292/15/4/847","",
+   "Tutor personal digital con RAG anclado en una base curada para un museo de ciencia (Citta della Scienza, Napoles), con avatar, voz y animacion; busca comunicacion inclusiva y multilingue (verificado en MDPI Electronics 15(4):847).",
+   "excluir","El entorno es un museo de ciencia, no educacion superior; fuera de la poblacion del criterio aunque lo desarrolle una universidad."),
+ ("H04","Optimizing and evaluating a retrieval-augmented generation system for normative document retrieval in hospital settings","2025","da Cunha M.V. et al.","","posible relacion con S03 (mismos autores, hospital): revisar si es version previa; ademas hospital, fuera de criterio.",
+   "","",""),
+ ("H05","DisastRAG: A Multi-Source Disaster Information Integration and Access System Based on Retrieval-Augmented Large Language Models","2026","Li B. et al.","","identificador arXiv del export (2605.05210) no verificado; tema de desastres, probablemente fuera del criterio; localizar la fuente.",
+   "","",""),
+ ("H06","From policy to practice: clause-grounded answers with retrieval-augmented generation","2026","Tsai W.L.; Huang R.Q.","","",
+   "","",""),
+ ("H07","Effective Chunking for Retrieval-Augmented Generation over Structured Institutional Documents","2026","Khalib S.S.I. et al.","","",
+   "","",""),
+ ("H08","Retrieval-Augmented Generative Indonesian Question Answering for Campus Planning Documents: A Case Study at Vocational School Universitas Sebelas Maret","2026","Khadija M.A. et al.","","resumen no localizado; tema (documentos de planificacion de campus) en criterio aparente: localizar la fuente para cribar.",
+   "","",""),
+ ("H09","OCR-integrated retrieval-augmented generation for PDF-document question answering system in vocational higher education","2026","Khadija M.A. et al.","","resumen no localizado; tema (QA sobre PDF en educacion superior tecnica) en criterio aparente: localizar la fuente para cribar.",
+   "","",""),
+ ("H10","Reimagining Academic Library Services through Local RAG: Concepts and Frameworks","2025","Pal P.K.","","resumen no localizado: localizar la fuente para cribar.",
+   "","",""),
 ]
 
 # --- Deduplicacion en codigo ---
@@ -90,7 +105,7 @@ for s in scopus:
                  "fuente":"scopus","nota":""})
 # scholar contra lo ya unico
 for h in scholar:
-    hid,tit,anio,aut,enl,nota = h
+    hid,tit,anio,aut,enl,nota,res,sug,just = h
     match = None
     for u in uniq:
         if u["anio"]==anio:
@@ -101,7 +116,7 @@ for h in scholar:
         dups.append((hid, match[0], match[1]))
         continue
     uniq.append({"id_ref":hid,"doi":"","titulo":tit,"anio":anio,"autores":aut,
-                 "enlace":enl,"resumen":"","sugerencia":"","justificacion":"",
+                 "enlace":enl,"resumen":res,"sugerencia":sug,"justificacion":just,
                  "fuente":"scholar","nota":nota})
 
 # --- coleccion.csv (registro unico, estado pendiente) ---

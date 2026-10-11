@@ -22,5 +22,12 @@ señalados, inclusiones y rechazos. No se borra nada; se añade.
   - DUPLICADO/parecido: H07 ≈ S09 (ratio 1.0) — "Effective Chunking…" en ambas fuentes; se conserva S09.
   - Observación para revisión humana: H04 (hospital, 2025) puede ser versión previa de S03 (hospital, 2026); distinto año y título, no se fusionó.
 - Resultado: **18 registros únicos** (10 Scopus + 8 de Académico), todos `pendiente`.
-- Cribado propuesto por IA: **7 incluir, 3 excluir** (S03 hospital, S05 banco central, S07 instituto de investigación: fuera de "educación superior"), **8 evidencia insuficiente** (los de Académico, sin resumen exportado).
+
+## 2026-10-11 · Recuperación de resúmenes de referencias de Académico
+- Para las referencias de Google Académico (sin resumen exportado) se intentó recuperar el resumen en su fuente real. Verificados y parafraseados:
+  - H01 (arXiv 2405.15436): RAG para informes de acreditación AACSB → incluir.
+  - H02 (MDPI Computers 15(9):564): RAG para soporte de decisiones en educación superior → incluir.
+  - H03 (MDPI Electronics 15(4):847): tutor digital para un museo de ciencia → excluir (no es educación superior).
+- No localizados / no verificados (quedan como evidencia insuficiente, sin inventar): H04 (hospital), H05 (DisastRAG, identificador no verificado), H08 y H09 (Khadija, tema aparentemente en criterio), H10 (biblioteca). Nota por registro en `pendientes.csv`.
+- Cribado propuesto por IA actualizado: **9 incluir, 4 excluir, 5 evidencia insuficiente**.
 - Falta: decisión humana por registro y verificación de citas en la síntesis.
