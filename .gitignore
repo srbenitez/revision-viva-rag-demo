@@ -4,5 +4,6 @@ __pycache__/
 proyecto-final/slide-*.jpg
 proyecto-final/*.pdf
 proyecto-final/audio/*.mp3
-proyecto-final/*.mp4
 proyecto-final/video/*.pdf
+proyecto-final/video/es_slides/
+proyecto-final/video/en_slides/
