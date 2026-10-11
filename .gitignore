@@ -3,3 +3,6 @@ __pycache__/
 .DS_Store
 proyecto-final/slide-*.jpg
 proyecto-final/*.pdf
+proyecto-final/audio/*.mp3
+proyecto-final/*.mp4
+proyecto-final/video/*.pdf
