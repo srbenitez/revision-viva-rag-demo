@@ -28,21 +28,31 @@ documentos institucionales en educación superior, de 2020 en adelante?
 Un registro se marca **pendiente** cuando el resumen no permite decidir; no se
 incluye ni se excluye sin evidencia.
 
-## Fuentes de búsqueda
+## Fuentes de búsqueda y cadenas (con registro de ejecución)
 
-Scopus · OpenAlex · Google Académico.
+| Fuente | Estado | Fecha | Resultado | Evidencia |
+|---|---|---|---|---|
+| Scopus | **ejecutada** | 2026-10-11 | 10 registros (con DOI y resumen) | `lotes/lote_scopus_2026-10-11_raw.csv` |
+| Google Académico | **ejecutada** | 2026-10-11 | 10 referencias (sin DOI ni resumen exportable) | `lotes/lote_scholar_2026-10-11_raw.txt` |
+| OpenAlex | **pendiente** | — | no ejecutada (el entorno bloqueó su API) | — |
 
-## Cadena de búsqueda
-
+**Scopus** (campo TITLE-ABS-KEY):
 ```
-("retrieval augmented generation" OR "RAG")
+TITLE-ABS-KEY(("retrieval augmented generation" OR "RAG")
 AND ("institutional documents" OR "document retrieval" OR "document question answering")
-AND (education OR university OR "higher education")
+AND (university OR "higher education" OR institutional)) AND PUBYEAR > 2019
 ```
 
-Fecha de ejecución del lote base: 2026-10-10. Cada ejecución posterior se registra
-con su fecha en `historial.md`; cambiar la cadena o un criterio genera una nueva
-versión de este protocolo.
+**Google Académico** (desde 2020): `"retrieval augmented generation" "institutional documents"`.
+Nota: Google Académico no exporta en lote de forma estructurada; sus referencias
+entran sin DOI ni resumen, por lo que su cribado de pertinencia queda como
+**evidencia insuficiente** hasta localizar la fuente.
+
+**OpenAlex** (pendiente de correr desde una red con acceso):
+`https://api.openalex.org/works?search=retrieval augmented generation institutional documents&filter=from_publication_date:2020-01-01,type:article`
+
+Cada ejecución se registra con su fecha en `historial.md`; cambiar una cadena o un
+criterio genera una nueva versión de este protocolo.
 
 ## Exportación
 

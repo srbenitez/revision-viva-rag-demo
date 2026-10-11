@@ -12,11 +12,13 @@ de la investigación real del autor.
 |---|---|
 | `protocolo.md` | Pregunta, criterios, fuentes, cadena de búsqueda, fecha; versión |
 | `reglas_dedup.md` | Normalización de DOI, umbral de título, regla sin DOI, rechazados |
-| `coleccion.csv` | Colección (8 referencias base aprobadas); **fuente de verdad auditable** |
-| `lotes/lote_2026-10-10.csv` | Lote nuevo de 4 (con un duplicado, un irrelevante y uno sin resumen) |
-| `pendientes.csv` | Registros nuevos con sugerencia de IA y justificación; decisión humana en blanco |
+| `coleccion.csv` | Registro único (18 referencias reales), estado `pendiente`; **fuente de verdad auditable** |
+| `lotes/*_raw.*` | Exports crudos y fechados de Scopus (2026-10-11) y Google Académico (2026-10-11) |
+| `lotes/lote_*_2026-10-11.csv` | Lotes normalizados por fuente |
+| `pendientes.csv` | Hoja de cribado: sugerencia de IA y justificación; decisión humana en blanco |
 | `historial.md` | Cambios fechados: duplicados, señalados, inclusiones, rechazos |
-| `dedup.py` | Deduplicación en código (no la hace el modelo) |
+| `build_real.py` | Ingesta de los lotes reales: normaliza, deduplica en código y arma colección y pendientes |
+| `dedup.py` | Deduplicación de un lote nuevo contra la colección (no la hace el modelo) |
 | `index.html` | Visor web de solo lectura que presenta los CSV y el historial |
 
 ## Cómo se usa
@@ -48,12 +50,16 @@ Deploy from a branch → `main` / `(root)`**. La vitrina queda en
 `https://<usuario>.github.io/revision-viva-rag-demo/`. Solo se publican metadatos y
 resúmenes públicos; nada de PDF con licencia ni de la revisión real.
 
-## Casos de comprobación (Guía 10)
+## Casos de comprobación (Guía 10), sobre datos reales
 
-- El **duplicado** (L01, mismo DOI que R01) se descarta y queda en el historial.
-- El **irrelevante** (L03, ResNet) recibe sugerencia *excluir* con motivo que cita el resumen.
-- El registro **sin resumen** (L04) marca *evidencia insuficiente*, sin inventar hallazgos.
-- Reimportar el mismo lote no reabre lo decidido.
+- **Duplicados entre fuentes**: H06≈S08 y H07≈S09 (mismos trabajos en Scopus y
+  Académico) se señalan por similitud de título y no se fusionan.
+- **Fuera de criterio**: S03 (hospital), S05 (banco central) y S07 (instituto de
+  investigación) reciben sugerencia *excluir* por no ser educación superior.
+- **Evidencia insuficiente**: las 8 referencias de Google Académico, sin resumen
+  exportado, quedan sin cribar y marcadas como tales, sin inventar hallazgos.
+- **Relación anotada**: H04 (hospital, 2025) se marca como posible versión previa de
+  S03 (2026) para revisión humana; no se fusiona.
 
 ## Límite
 
