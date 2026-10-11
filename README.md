@@ -18,26 +18,40 @@ de la investigación real del autor.
 | `pendientes.csv` | Hoja de cribado: sugerencia de IA y justificación; decisión humana en blanco |
 | `historial.md` | Cambios fechados: duplicados, señalados, inclusiones, rechazos |
 | `build_real.py` | Ingesta de los lotes reales: normaliza, deduplica en código y arma colección y pendientes |
+| `importar_scopus.py` | Mapea un export crudo de Scopus al esquema del registro y asigna identificadores |
 | `dedup.py` | Deduplicación de un lote nuevo contra la colección (no la hace el modelo) |
 | `index.html` | Visor web de solo lectura que presenta los CSV y el historial |
 
 ## Cómo se usa
 
-1. **Procesar un lote nuevo** (deduplica y arma pendientes):
-   ```
-   python3 dedup.py lotes/lote_2026-10-10.csv
-   ```
-   Escribe `pendientes.csv` y añade un bloque fechado a `historial.md`.
+### Reconstruir el estado de la demostración
+```
+python3 build_real.py        # arma coleccion.csv y pendientes.csv desde los lotes reales
+python3 apply_decisions.py   # aplica la decisión humana (9 aprobados, 4 rechazados, 5 pendientes)
+```
 
-2. **Sugerencia de pertinencia (IA):** sobre los registros nuevos de `pendientes.csv`,
+### Procesar un lote NUEVO de Scopus (flujo vivo)
+1. Guarda el export crudo de Scopus en `lotes/`, por ejemplo `lote_scopus_2026-11-15_raw.csv`.
+2. Normalízalo e importa (mapea columnas y asigna identificadores sin choque):
+   ```
+   python3 importar_scopus.py lotes/lote_scopus_2026-11-15_raw.csv
+   ```
+3. Deduplica contra la colección (descarta duplicados por DOI, señala títulos parecidos):
+   ```
+   python3 dedup.py lotes/lote_scopus_2026-11-15.csv
+   ```
+   Reescribe `pendientes.csv` con lo nuevo y añade un bloque fechado a `historial.md`.
+   Un DOI ya presente se descarta y se anota; un rechazado que reaparece se advierte.
+
+4. **Sugerencia de pertinencia (IA):** sobre los registros nuevos de `pendientes.csv`,
    se pide a Claude —con `protocolo.md` y los resúmenes— una sugerencia *incluir/excluir*
    con justificación de dos frases. Nunca se evalúa un registro sin resumen: se marca
    "evidencia insuficiente".
 
-3. **Decisión humana:** se completa `decision_humana`, `revisor` y `fecha` en
+5. **Decisión humana:** se completa `decision_humana`, `revisor` y `fecha` en
    `pendientes.csv`/`coleccion.csv`. La IA propone; usted decide.
 
-4. **Ver el registro:** abrir el visor desde un servidor (no con doble clic):
+6. **Ver el registro:** abrir el visor desde un servidor (no con doble clic):
    ```
    python3 -m http.server 8000
    ```
