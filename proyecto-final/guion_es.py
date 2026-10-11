@@ -3,7 +3,7 @@
 guion = {
  1: ("Portada", 25, 35,
  "Presentamos nuestro registro de revisión bibliográfica en actualización continua. "
- "Somos Marcelo Carrera, de la Universidad U T E, y Raymundo Benítez, de la U T P L. "
+ "Somos Marcelo Carrera, de la Universidad U T E, y Segundo Benítez, de la U T P L. "
  "Mantiene viva una revisión sin rehacerla a mano."),
  2: ("El problema", 70, 80,
  "Una revisión bibliográfica envejece desde el día en que se entrega. "
@@ -93,7 +93,7 @@ guion = {
  "Y la decisión sigue siendo humana. "
  "Pueden ver el proyecto en nuestro sitio público. "
  "Gracias por acompañarnos. "
- "Somos Marcelo Carrera y Raymundo Benítez, de la U T E y la U T P L."),
+ "Somos Marcelo Carrera y Segundo Benítez, de la U T E y la U T P L."),
 }
 tot_w=0; tot_s=0
 print(f"{'#':>2} {'Diapositiva':34} {'Pal':>4} {'Rango':>9} {'Seg':>5} Estado")
