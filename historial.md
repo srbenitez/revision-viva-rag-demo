@@ -30,4 +30,9 @@ señalados, inclusiones y rechazos. No se borra nada; se añade.
   - H03 (MDPI Electronics 15(4):847): tutor digital para un museo de ciencia → excluir (no es educación superior).
 - No localizados / no verificados (quedan como evidencia insuficiente, sin inventar): H04 (hospital), H05 (DisastRAG, identificador no verificado), H08 y H09 (Khadija, tema aparentemente en criterio), H10 (biblioteca). Nota por registro en `pendientes.csv`.
 - Cribado propuesto por IA actualizado: **9 incluir, 4 excluir, 5 evidencia insuficiente**.
-- Falta: decisión humana por registro y verificación de citas en la síntesis.
+
+## 2026-10-11 · Decisión humana y cierre (Módulo 5)
+- Decisión humana registrada (revisor: srbenitez): adopta la sugerencia de pertinencia (ejercicio académico). Resultado: **9 aprobados** (S01, S02, S04, S06, S08, S09, S10, H01, H02), **4 rechazados** (S03, S05, S07, H03), **5 pendientes** por evidencia insuficiente (H04, H05, H08, H09, H10). Los rechazados se conservan.
+- Síntesis `sintesis_2026-10-11.md`: solo aprobados, con 3 citas comprobadas — una verificada contra texto completo con ubicación (H02, §5.3) y dos como observación del resumen (H01, S09).
+- Nota metodológica y declaración de IA: `nota_metodologica.md`.
+- Pendiente para una versión futura: ejecutar OpenAlex y recuperar el texto de H08/H09.
