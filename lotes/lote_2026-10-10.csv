@@ -1,0 +1,5 @@
+id_ref,doi,titulo,anio,autores,enlace,resumen
+L01,https://doi.org/10.48550/arXiv.2005.11401,Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,2020,Lewis et al.,https://arxiv.org/abs/2005.11401,"Arquitectura RAG que combina recuperador y generador para tareas intensivas en conocimiento."
+L02,10.48550/arXiv.2404.16130,From Local to Global: A Graph RAG Approach to Query-Focused Summarization,2024,Edge et al.,https://arxiv.org/abs/2404.16130,"Propone GraphRAG: construye un grafo de conocimiento a partir de una colección de documentos para responder preguntas globales que la recuperación por fragmentos no cubre bien. Aplicable a consultar grandes repositorios documentales."
+L03,10.48550/arXiv.1512.03385,Deep Residual Learning for Image Recognition,2015,He et al.,https://arxiv.org/abs/1512.03385,"Introduce redes residuales profundas (ResNet) para clasificación de imágenes; aborda el problema de degradación al aumentar la profundidad de la red."
+L04,10.48550/arXiv.2208.03299,Atlas: Few-shot Learning with Retrieval Augmented Language Models,2022,Izacard et al.,https://arxiv.org/abs/2208.03299,

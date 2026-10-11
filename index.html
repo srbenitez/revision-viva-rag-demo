@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión viva · RAG en documentos institucionales</title>
+<style>
+  :root{
+    --bg:#fbfaf8; --panel:#ffffff; --ink:#1c1a17; --muted:#6b645c;
+    --line:#e7e2db; --accent:#6b2d4f; --accent-soft:#f3e8ee;
+    --ok:#1f6f43; --ok-bg:#e8f3ec; --no:#8a2b2b; --no-bg:#f6e9e9;
+    --wait:#8a6d1f; --wait-bg:#f6efdc;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#17150f; --panel:#201d16; --ink:#efe9e0; --muted:#a79f93;
+      --line:#332e25; --accent:#d98cb3; --accent-soft:#2a1d25;
+      --ok:#7fc49b; --ok-bg:#16291e; --no:#e39b9b; --no-bg:#2a1818;
+      --wait:#dcc277; --wait-bg:#2a2412;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    padding:0 16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 0 64px}
+  header h1{font-size:1.5rem;margin:0 0 4px}
+  header p{color:var(--muted);margin:0 0 6px}
+  .asof{font-size:.85rem;color:var(--muted)}
+  nav{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 10px}
+  nav button{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+    border-radius:999px;padding:7px 14px;font-size:.9rem;cursor:pointer}
+  nav button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:18px;margin-top:14px}
+  section[hidden]{display:none}
+  h2{font-size:1.1rem;margin:0 0 4px}
+  .hint{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .filters input,.filters select{background:var(--bg);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.9rem}
+  .filters input{flex:1;min-width:180px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.03em}
+  td a{color:var(--accent)}
+  .tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:600;white-space:nowrap}
+  .t-ok{background:var(--ok-bg);color:var(--ok)}
+  .t-no{background:var(--no-bg);color:var(--no)}
+  .t-wait{background:var(--wait-bg);color:var(--wait)}
+  .count{color:var(--muted);font-size:.85rem;margin-top:10px}
+  pre.hist{white-space:pre-wrap;font:.9rem/1.6 ui-monospace,Menlo,Consolas,monospace;
+    background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;overflow:auto}
+  .err{color:var(--no);font-size:.9rem}
+  footer{color:var(--muted);font-size:.82rem;margin-top:26px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Revisión bibliográfica en actualización continua</h1>
+    <p>Caso de demostración · Uso de RAG para consultar documentos institucionales</p>
+    <p class="asof">Protocolo v1 · lote 2026-10-10 · vista de solo lectura del registro auditable (CSV)</p>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-panel="coleccion">Colección</button>
+    <button role="tab" aria-selected="false" data-panel="pendientes">Pendientes</button>
+    <button role="tab" aria-selected="false" data-panel="historial">Historial</button>
+  </nav>
+
+  <section id="coleccion" aria-label="Colección">
+    <h2>Colección</h2>
+    <p class="hint">Referencias con su estado y la decisión humana registrada. La fuente de verdad es <code>coleccion.csv</code>.</p>
+    <div class="filters">
+      <label>Buscar <input id="q-col" type="search" placeholder="título, autor, DOI…" aria-label="Buscar en la colección"></label>
+      <label>Estado
+        <select id="f-estado" aria-label="Filtrar por estado">
+          <option value="">Todos</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="rechazado">Rechazado</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </label>
+    </div>
+    <div id="tbl-col"></div>
+    <p class="count" id="count-col"></p>
+  </section>
+
+  <section id="pendientes" aria-label="Pendientes" hidden>
+    <h2>Pendientes de aprobación</h2>
+    <p class="hint">Sugerencia de la IA con justificación; la decisión la toma una persona. La IA propone, usted decide.</p>
+    <div class="filters">
+      <label>Buscar <input id="q-pen" type="search" placeholder="título, sugerencia…" aria-label="Buscar en pendientes"></label>
+    </div>
+    <div id="tbl-pen"></div>
+    <p class="count" id="count-pen"></p>
+  </section>
+
+  <section id="historial" aria-label="Historial" hidden>
+    <h2>Historial fechado</h2>
+    <p class="hint">Cambios por lote: duplicados, títulos señalados, inclusiones y rechazos. No se borra nada.</p>
+    <pre class="hist" id="hist-box">Cargando…</pre>
+  </section>
+
+  <footer>
+    Demostración pública, independiente de la investigación real. Solo metadatos y resúmenes públicos.
+    El registro no constituye por sí mismo una revisión sistemática.
+  </footer>
+</div>
+
+<script>
+// --- CSV mínimo con soporte de campos entre comillas ---
+function parseCSV(text){
+  const rows=[]; let row=[], field='', inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else inQ=false; }
+      else field+=c;
+    }else{
+      if(c==='"') inQ=true;
+      else if(c===',') {row.push(field);field='';}
+      else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';}
+      else if(c==='\r'){}
+      else field+=c;
+    }
+  }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  const header=rows.shift()||[];
+  return rows.filter(r=>r.some(v=>v!=='')).map(r=>Object.fromEntries(header.map((h,i)=>[h,r[i]??''])));
+}
+async function load(path){
+  const res=await fetch(path,{cache:'no-store'});
+  if(!res.ok) throw new Error(path+': '+res.status);
+  return res.text();
+}
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function tag(estado){
+  const e=(estado||'').toLowerCase();
+  const cls=e==='aprobado'?'t-ok':e==='rechazado'?'t-no':'t-wait';
+  return `<span class="tag ${cls}">${esc(estado||'pendiente')}</span>`;
+}
+
+let COL=[], PEN=[];
+
+function renderCol(){
+  const q=(document.getElementById('q-col').value||'').toLowerCase();
+  const fe=document.getElementById('f-estado').value;
+  const rows=COL.filter(r=>{
+    const hay=(r.titulo+' '+r.autores+' '+r.doi).toLowerCase().includes(q);
+    const est=!fe||(r.estado||'').toLowerCase()===fe;
+    return hay&&est;
+  });
+  let h='<table><thead><tr><th>ID</th><th>Título</th><th>Año</th><th>Estado</th><th>Motivo</th></tr></thead><tbody>';
+  for(const r of rows){
+    h+=`<tr><td>${esc(r.id_ref)}</td>
+      <td><a href="${esc(r.enlace)}" target="_blank" rel="noopener">${esc(r.titulo)}</a><br><span style="color:var(--muted)">${esc(r.autores)} · ${esc(r.doi)}</span></td>
+      <td>${esc(r.anio)}</td><td>${tag(r.estado)}</td><td>${esc(r.motivo)}</td></tr>`;
+  }
+  h+='</tbody></table>';
+  document.getElementById('tbl-col').innerHTML=h;
+  document.getElementById('count-col').textContent=`${rows.length} de ${COL.length} referencias`;
+}
+function renderPen(){
+  const q=(document.getElementById('q-pen').value||'').toLowerCase();
+  const rows=PEN.filter(r=>(r.titulo+' '+r.sugerencia_ia+' '+r.nota).toLowerCase().includes(q));
+  let h='<table><thead><tr><th>ID</th><th>Título</th><th>Sugerencia IA</th><th>Justificación</th><th>Decisión humana</th></tr></thead><tbody>';
+  for(const r of rows){
+    const sug=r.nota?`<span class="tag t-wait">evidencia insuficiente</span>`:tag(r.sugerencia_ia==='incluir'?'aprobado':r.sugerencia_ia==='excluir'?'rechazado':'pendiente').replace(/>[^<]*</,'>'+esc(r.sugerencia_ia||'—')+'<');
+    h+=`<tr><td>${esc(r.id_ref)}</td>
+      <td><a href="${esc(r.enlace)}" target="_blank" rel="noopener">${esc(r.titulo)}</a></td>
+      <td>${sug}</td><td>${esc(r.justificacion||r.nota)}</td>
+      <td>${esc(r.decision_humana)||'<span style="color:var(--muted)">por decidir</span>'}</td></tr>`;
+  }
+  h+='</tbody></table>';
+  document.getElementById('tbl-pen').innerHTML=h;
+  document.getElementById('count-pen').textContent=`${rows.length} pendientes`;
+}
+
+// pestañas
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected','false'));
+    b.setAttribute('aria-selected','true');
+    ['coleccion','pendientes','historial'].forEach(id=>document.getElementById(id).hidden=(id!==b.dataset.panel));
+  });
+});
+document.getElementById('q-col').addEventListener('input',renderCol);
+document.getElementById('f-estado').addEventListener('change',renderCol);
+document.getElementById('q-pen').addEventListener('input',renderPen);
+
+(async()=>{
+  try{ COL=parseCSV(await load('coleccion.csv')); renderCol(); }
+  catch(e){ document.getElementById('tbl-col').innerHTML=`<p class="err">No se pudo leer coleccion.csv (${esc(e.message)}). Abra la página desde un servidor o GitHub Pages, no con doble clic.</p>`; }
+  try{ PEN=parseCSV(await load('pendientes.csv')); renderPen(); }
+  catch(e){ document.getElementById('tbl-pen').innerHTML=`<p class="err">No se pudo leer pendientes.csv (${esc(e.message)}).</p>`; }
+  try{ document.getElementById('hist-box').textContent=await load('historial.md'); }
+  catch(e){ document.getElementById('hist-box').textContent='No se pudo leer historial.md ('+e.message+')'; }
+})();
+</script>
+</body>
+</html>
